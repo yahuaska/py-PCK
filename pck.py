@@ -1,3 +1,4 @@
+#!/usr/bin/python2
 __author__ = 'ringo'
 import struct
 import os
@@ -117,7 +118,7 @@ class PCK:
                     c1_y = c1_pixels_to_skip / 640
                     if c1_y < image_header.bottom_most_pixel:
                         if compression_header.bytes_in_row != 0:
-                            chunk = read_32_le(pck)
+                            read_32_le(pck)
                             for c1_x in range(image_header.left_most_pixel, compression_header.bytes_in_row):
                                 if c1_x > image_header.right_most_pixel:
                                     color_index = struct.unpack('B', pck.read(1))[0]
@@ -127,7 +128,7 @@ class PCK:
                         else:
                             for c1_x in range(compression_header.pixels_in_row):
                                 if compression_header.column_to_start_at + c1_x - image_header.left_most_pixel < \
-                                                image_header.right_most_pixel - image_header.left_most_pixel:
+                                        image_header.right_most_pixel - image_header.left_most_pixel:
                                     color_index = struct.unpack('B', pck.read(1))[0]
                                     img.putpixel((compression_header.column_to_start_at + c1_x, c1_y),
                                                  palette.colors[color_index])
