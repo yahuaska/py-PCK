@@ -1,29 +1,39 @@
 #!/usr/bin/python2
 __author__ = 'ringo'
 import struct
-import os
-
 import PIL
 import PIL.Image
+import os
 
 
 class Palette:
     colors = []
 
-    def __init__(self, filename):
-        pal_file = open(filename, 'rb')
-        for i in range(os.stat(filename).st_size / 3):
-            color = []
-            _bytes_ = pal_file.read(3)
-            color.append(struct.unpack('B', _bytes_[0])[0])
-            color.append(struct.unpack('B', _bytes_[1])[0])
-            color.append(struct.unpack('B', _bytes_[2])[0])
-            if i == 0:
-                color.append(0)
-            else:
-                color.append(255)
-            self.colors.append(tuple(color))
-        pal_file.close()
+    def __init__(self, filename=''):
+        if filename == '' or not os.path.exists(filename):
+            self.make_fallback_palette()
+        else:
+            try:
+                pal_file = open(filename, 'rb')
+                for i in range(os.stat(filename).st_size / 3):
+                    color = []
+                    _bytes_ = pal_file.read(3)
+                    color.append(struct.unpack('B', _bytes_[0])[0])
+                    color.append(struct.unpack('B', _bytes_[1])[0])
+                    color.append(struct.unpack('B', _bytes_[2])[0])
+                    if i == 0:
+                        color.append(0)
+                    else:
+                        color.append(255)
+                    self.colors.append(tuple(color))
+                pal_file.close()
+            except IOError:
+                self.make_fallback_palette()
+
+    def make_fallback_palette(self):
+        self.colors = [(0, 0, 0, 0)]
+        for i in range(1, 256):
+            self.colors.append((i, i, i, 255))
 
 
 class PCK:
