@@ -4,12 +4,15 @@ import struct
 import PIL
 import PIL.Image
 import os
+try:
+    from cStringIO import StringIO
+except ImportError:
+    from StringIO import StringIO
 
 
 class Palette:
-    colors = []
-
     def __init__(self, filename=''):
+        self.colors = []
         if filename == '' or not os.path.exists(filename):
             self.make_fallback_palette()
         else:
@@ -37,9 +40,8 @@ class Palette:
 
 
 class PCK:
-    images = []
-
     def __init__(self, pck_filename, tab_filename, colour_palette, index=-1):
+        self.images = []
         self.process_file(pck_filename, tab_filename, colour_palette, index)
 
     def process_file(self, pck_filename, tab_filename, colour_palette, index):
@@ -66,7 +68,6 @@ class PCK:
         :param colour_palette: file?
         :return:
         """
-
         # c0_offset: 16bit int
         palette = Palette(colour_palette)
         c0_image_data = []
@@ -96,7 +97,6 @@ class PCK:
                 c0_height += 1
                 c0_offset = read_16_le(pck)
             tmp_img = PIL.Image.new('RGBA', (c0_max_width, c0_height))
-            # tmp_img.size()
             c0_idx = 0
             for c0_y in range(c0_height):
                 for c0_x in range(c0_max_width):
@@ -152,13 +152,6 @@ class PCK:
 
 
 class C1ImageHeader:
-    reserved1 = None
-    reserved2 = None
-    left_most_pixel = None
-    right_most_pixel = None
-    top_most_pixel = None
-    bottom_most_pixel = None
-
     def __init__(self, file_ptr):
         self.reserved1 = struct.unpack('B', file_ptr.read(1))[0]
         self.reserved2 = struct.unpack('B', file_ptr.read(1))[0]
@@ -166,15 +159,9 @@ class C1ImageHeader:
         self.right_most_pixel = read_16_le(file_ptr)
         self.top_most_pixel = read_16_le(file_ptr)
         self.bottom_most_pixel = read_16_le(file_ptr)
-        return
 
 
 class PCKCompressionHeader:
-    column_to_start_at = None
-    pixels_in_row = None
-    bytes_in_row = None
-    padding_in_row = None
-
     def __init__(self, file_ptr):
         self.column_to_start_at = struct.unpack('B', file_ptr.read(1))[0]
         self.pixels_in_row = struct.unpack('B', file_ptr.read(1))[0]
